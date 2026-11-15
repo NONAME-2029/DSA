@@ -1,0 +1,2302 @@
+// 1. Write a C program to implement a stack using arrays and perform operations:
+// push, pop, peek, and display.
+
+
+#include <stdio.h>
+#define MAX 100
+
+int stack[MAX], top = -1;
+
+void push() {
+    int x;
+    if (top == MAX - 1)
+        printf("Stack Overflow\n");
+    else {
+        printf("Enter element: ");
+        scanf("%d", &x);
+        stack[++top] = x;
+    }
+}
+
+void pop() {
+    if (top == -1)
+        printf("Stack Underflow\n");
+    else
+        printf("Popped: %d\n", stack[top--]);
+}
+
+void peek() {
+    if (top == -1)
+        printf("Stack is Empty\n");
+    else
+        printf("Top element: %d\n", stack[top]);
+}
+
+void display() {
+    int i;
+    if (top == -1)
+        printf("Stack is Empty\n");
+    else {
+        printf("Stack elements: ");
+        for (i = top; i >= 0; i--)
+            printf("%d ", stack[i]);
+        printf("\n");
+    }
+}
+
+int main() {
+    int choice;
+
+    do {
+        printf("\n1.Push\n2.Pop\n3.Peek\n4.Display\n5.Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: push(); break;
+            case 2: pop(); break;
+            case 3: peek(); break;
+            case 4: display(); break;
+            case 5: printf("Exiting...\n"); break;
+            default: printf("Invalid Choice\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}
+
+
+
+
+// 2. Write a C program to evaluate a postfix expression and to convert an infix
+// expression to postfix using stacks. Eg.: A+B*C —> ABC*+
+
+
+#include <stdio.h>
+#include <ctype.h>
+
+char stack[100];
+int top = -1;
+
+void push(char x) {
+    stack[++top] = x;
+}
+
+char pop() {
+    return stack[top--];
+}
+
+
+int priority(char x) {
+    if (x == '^') return 3;
+    if (x == '*' || x == '/') return 2;
+    if (x == '+' || x == '-') return 1;
+    return 0;
+}
+
+void infixToPostfix(char infix[]) {
+    char postfix[100];
+    int i, j = 0;
+
+    for (i = 0; infix[i] != '\0'; i++) {
+        char ch = infix[i];
+
+        if (isalnum(ch))
+            postfix[j++] = ch;
+
+        else if (ch == '(')
+            push(ch);
+
+        else if (ch == ')') {
+            while (top != -1 && stack[top] != '(')
+                postfix[j++] = pop();
+            pop();
+        }
+
+        else {
+            while (top != -1 && priority(stack[top]) >= priority(ch))
+                postfix[j++] = pop();
+            push(ch);
+        }
+    }
+
+    while (top != -1)
+        postfix[j++] = pop();
+
+    postfix[j] = '\0';
+    printf("Postfix: %s\n", postfix);
+}
+
+int main() {
+    char infix[100];
+
+    printf("Enter infix expression: ");
+    scanf("%s", infix);
+
+    infixToPostfix(infix);
+
+    return 0;
+}
+
+
+
+// 3. Write a C program that evaluates a postfix expression by using a stack to store
+// operands and applying operators in the correct order to obtain the final numerical
+// result.
+// Eg.: Input: 23*54*+9-
+// Evaluation → ((2*3)+(5*4))-9 = 17
+
+
+#include <stdio.h>
+#include <ctype.h>
+
+int stack[100], top = -1;
+
+void push(int x) {
+    stack[++top] = x;
+}
+
+int pop() {
+    return stack[top--];
+}
+
+int evaluate(char exp[]) {
+    int i, a, b;
+
+    for (i = 0; exp[i] != '\0'; i++) {
+        if (isdigit(exp[i]))
+            push(exp[i] - '0');
+
+        else {
+            b = pop();
+            a = pop();
+
+            switch (exp[i]) {
+                case '+': push(a + b); break;
+                case '-': push(a - b); break;
+                case '*': push(a * b); break;
+                case '/': push(a / b); break;
+            }
+        }
+    }
+
+    return pop();
+}
+
+int main() {
+    char exp[100];
+
+    printf("Enter postfix expression: ");
+    scanf("%s", exp);
+
+    printf("Result = %d\n", evaluate(exp));
+
+    return 0;
+}
+
+
+
+
+
+// 4. Write a program in C to implement a Singly Linked List with 5 integer elements.
+// Perform insertion, deletion, and traversal operations.
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *head = NULL;
+
+struct node* getnode() {
+    struct node *newnode;
+    newnode = (struct node*)malloc(sizeof(struct node));
+    return newnode;
+}
+
+void insert(int x) {
+    struct node *newnode, *temp;
+
+    newnode = getnode();
+    newnode->data = x;
+    newnode->next = NULL;
+
+    if (head == NULL)
+        head = newnode;
+    else {
+        temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+
+        temp->next = newnode;
+    }
+}
+
+void delete() {
+    struct node *temp;
+
+    if (head == NULL)
+        printf("List is Empty\n");
+    else {
+        temp = head;
+        head = head->next;
+
+        printf("Deleted: %d\n", temp->data);
+        free(temp);
+    }
+}
+
+void traverse() {
+    struct node *temp = head;
+
+    if (head == NULL)
+        printf("List is Empty\n");
+    else {
+        printf("Linked List: ");
+
+        while (temp != NULL) {
+            printf("%d ", temp->data);
+            temp = temp->next;
+        }
+
+        printf("\n");
+    }
+}
+
+int main() {
+    int i, x, choice;
+
+    printf("Enter 5 elements:\n");
+
+    for (i = 0; i < 5; i++) {
+        scanf("%d", &x);
+        insert(x);
+    }
+
+    do {
+        printf("\n1. Insert\n2. Delete\n3. Traverse\n4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insert(x);
+                break;
+
+            case 2:
+                delete();
+                break;
+
+            case 3:
+                traverse();
+                break;
+
+            case 4:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
+
+
+
+
+// 5. Write a program to implement a Doubly Linked List with 10 float elements,
+// allowing insertion and deletion from both ends.
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    float data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL, *tail = NULL;
+
+struct node* getnode() {
+    struct node *newnode;
+    newnode = (struct node*)malloc(sizeof(struct node));
+    return newnode;
+}
+
+void insertBeg(float x) {
+    struct node *newnode = getnode();
+
+    newnode->data = x;
+    newnode->prev = NULL;
+    newnode->next = head;
+
+    if (head == NULL)
+        head = tail = newnode;
+    else {
+        head->prev = newnode;
+        head = newnode;
+    }
+}
+
+void insertEnd(float x) {
+    struct node *newnode = getnode();
+
+    newnode->data = x;
+    newnode->next = NULL;
+    newnode->prev = tail;
+
+    if (tail == NULL)
+        head = tail = newnode;
+    else {
+        tail->next = newnode;
+        tail = newnode;
+    }
+}
+
+void deleteBeg() {
+    struct node *temp;
+
+    if (head == NULL)
+        printf("List is Empty\n");
+    else {
+        temp = head;
+        head = head->next;
+
+        if (head == NULL)
+            tail = NULL;
+        else
+            head->prev = NULL;
+
+        printf("Deleted: %.2f\n", temp->data);
+        free(temp);
+    }
+}
+
+void deleteEnd() {
+    struct node *temp;
+
+    if (tail == NULL)
+        printf("List is Empty\n");
+    else {
+        temp = tail;
+        tail = tail->prev;
+
+        if (tail == NULL)
+            head = NULL;
+        else
+            tail->next = NULL;
+
+        printf("Deleted: %.2f\n", temp->data);
+        free(temp);
+    }
+}
+
+void display() {
+    struct node *temp = head;
+
+    if (head == NULL)
+        printf("List is Empty\n");
+    else {
+        printf("List: ");
+        while (temp != NULL) {
+            printf("%.2f ", temp->data);
+            temp = temp->next;
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int i, choice;
+    float x;
+
+    printf("Enter 10 float elements:\n");
+
+    for (i = 0; i < 10; i++) {
+        scanf("%f", &x);
+        insertEnd(x);
+    }
+
+    do {
+        printf("\n1. Insert at Beginning");
+        printf("\n2. Insert at End");
+        printf("\n3. Delete from Beginning");
+        printf("\n4. Delete from End");
+        printf("\n5. Display");
+        printf("\n6. Exit");
+
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%f", &x);
+                insertBeg(x);
+                break;
+
+            case 2:
+                printf("Enter element: ");
+                scanf("%f", &x);
+                insertEnd(x);
+                break;
+
+            case 3:
+                deleteBeg();
+                break;
+
+            case 4:
+                deleteEnd();
+                break;
+
+            case 5:
+                display();
+                break;
+
+            case 6:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+
+    } while (choice != 6);
+
+    return 0;
+}
+
+
+// 6. To write a C program to implement a Circular Doubly Linked List that supports
+// insertion at the beginning and end, and displays all nodes.
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+struct node* getnode() {
+    struct node *newnode;
+    newnode = (struct node*)malloc(sizeof(struct node));
+    return newnode;
+}
+
+void insertBeg(int x) {
+    struct node *newnode = getnode();
+
+    newnode->data = x;
+
+    if (head == NULL) {
+        newnode->next = newnode;
+        newnode->prev = newnode;
+        head = newnode;
+    }
+    else {
+        struct node *last = head->prev;
+
+        newnode->next = head;
+        newnode->prev = last;
+
+        last->next = newnode;
+        head->prev = newnode;
+
+        head = newnode;
+    }
+}
+
+void insertEnd(int x) {
+    struct node *newnode = getnode();
+
+    newnode->data = x;
+
+    if (head == NULL) {
+        newnode->next = newnode;
+        newnode->prev = newnode;
+        head = newnode;
+    }
+    else {
+        struct node *last = head->prev;
+
+        newnode->next = head;
+        newnode->prev = last;
+
+        last->next = newnode;
+        head->prev = newnode;
+    }
+}
+
+void display() {
+    struct node *temp = head;
+
+    if (head == NULL) {
+        printf("List is Empty\n");
+        return;
+    }
+
+    printf("Circular Doubly Linked List: ");
+
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("\n");
+}
+
+int main() {
+    int choice, x;
+
+    do {
+        printf("\n1. Insert at Beginning");
+        printf("\n2. Insert at End");
+        printf("\n3. Display");
+        printf("\n4. Exit");
+
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insertBeg(x);
+                break;
+
+            case 2:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insertEnd(x);
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
+
+
+// 6. To write a C program to implement a Circular Doubly Linked List that supports
+// insertion at the beginning and end, and displays all nodes.
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+struct node* getnode() {
+    struct node *newnode;
+    newnode = (struct node*)malloc(sizeof(struct node));
+    return newnode;
+}
+
+void insertBeg(int x) {
+    struct node *newnode = getnode();
+
+    newnode->data = x;
+
+    if (head == NULL) {
+        newnode->next = newnode;
+        newnode->prev = newnode;
+        head = newnode;
+    }
+    else {
+        struct node *last = head->prev;
+
+        newnode->next = head;
+        newnode->prev = last;
+
+        last->next = newnode;
+        head->prev = newnode;
+
+        head = newnode;
+    }
+}
+
+void insertEnd(int x) {
+    struct node *newnode = getnode();
+
+    newnode->data = x;
+
+    if (head == NULL) {
+        newnode->next = newnode;
+        newnode->prev = newnode;
+        head = newnode;
+    }
+    else {
+        struct node *last = head->prev;
+
+        newnode->next = head;
+        newnode->prev = last;
+
+        last->next = newnode;
+        head->prev = newnode;
+    }
+}
+
+void display() {
+    struct node *temp = head;
+
+    if (head == NULL) {
+        printf("List is Empty\n");
+        return;
+    }
+
+    printf("Circular Doubly Linked List: ");
+
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("\n");
+}
+
+int main() {
+    int choice, x;
+
+    do {
+        printf("\n1. Insert at Beginning");
+        printf("\n2. Insert at End");
+        printf("\n3. Display");
+        printf("\n4. Exit");
+
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insertBeg(x);
+                break;
+
+            case 2:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insertEnd(x);
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
+
+// 7. To write a C program to implement a Circular Doubly Linked List that performs
+// deletion from beginning and end, insertion between nodes, deletion based on a
+// condition, and displays all nodes.
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+struct node* getnode() {
+    struct node *newnode;
+    newnode = (struct node*)malloc(sizeof(struct node));
+    return newnode;
+}
+
+
+void insertEnd(int x) {
+    struct node *newnode = getnode();
+
+    newnode->data = x;
+
+    if (head == NULL) {
+        newnode->next = newnode;
+        newnode->prev = newnode;
+        head = newnode;
+    }
+    else {
+        struct node *last = head->prev;
+
+        newnode->next = head;
+        newnode->prev = last;
+        last->next = newnode;
+        head->prev = newnode;
+    }
+}
+
+void deleteBeg() {
+    struct node *temp;
+
+    if (head == NULL) {
+        printf("List is Empty\n");
+        return;
+    }
+
+    temp = head;
+
+    if (head->next == head)
+        head = NULL;
+    else {
+        struct node *last = head->prev;
+        head = head->next;
+        head->prev = last;
+        last->next = head;
+    }
+
+    free(temp);
+}
+
+void deleteEnd() {
+    struct node *temp;
+
+    if (head == NULL) {
+        printf("List is Empty\n");
+        return;
+    }
+
+    temp = head->prev;
+
+    if (head->next == head)
+        head = NULL;
+    else {
+        struct node *last = temp->prev;
+        last->next = head;
+        head->prev = last;
+    }
+
+    free(temp);
+}
+
+void insertBetween(int x, int pos) {
+    struct node *newnode, *temp;
+    int i;
+
+    if (head == NULL) {
+        printf("List is Empty\n");
+        return;
+    }
+
+    if (pos < 1) {
+        printf("Invalid Position\n");
+        return;
+    }
+
+    if (pos == 1) {
+        struct node *last = head->prev;
+
+        newnode = getnode();
+        newnode->data = x;
+
+        newnode->next = head;
+        newnode->prev = last;
+
+        last->next = newnode;
+        head->prev = newnode;
+
+        head = newnode;
+        return;
+    }
+
+    temp = head;
+
+    for (i = 1; i < pos - 1 && temp->next != head; i++)
+        temp = temp->next;
+
+    if (i != pos - 1) {
+        printf("Invalid Position\n");
+        return;
+    }
+
+    newnode = getnode();
+    newnode->data = x;
+
+    newnode->next = temp->next;
+    newnode->prev = temp;
+    temp->next->prev = newnode;
+    temp->next = newnode;
+}
+
+void deleteCondition(int x) {
+    struct node *temp = head;
+
+    if (head == NULL) {
+        printf("List is Empty\n");
+        return;
+    }
+
+    do {
+        if (temp->data == x) {
+            if (temp->next == temp)
+                head = NULL;
+            else {
+                temp->prev->next = temp->next;
+                temp->next->prev = temp->prev;
+
+                if (temp == head)
+                    head = temp->next;
+            }
+
+            free(temp);
+            printf("Node Deleted\n");
+            return;
+        }
+
+        temp = temp->next;
+
+    } while (temp != head);
+
+    printf("Element Not Found\n");
+}
+
+void display() {
+    struct node *temp = head;
+
+    if (head == NULL) {
+        printf("List is Empty\n");
+        return;
+    }
+
+    printf("List: ");
+
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("\n");
+}
+
+int main() {
+    int choice, x, pos;
+
+    do {
+        printf("\n1. Insert at End");
+        printf("\n2. Delete from Beginning");
+        printf("\n3. Delete from End");
+        printf("\n4. Insert Between Nodes");
+        printf("\n5. Delete by Value");
+        printf("\n6. Display");
+        printf("\n7. Exit");
+
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insertEnd(x);
+                break;
+
+            case 2:
+                deleteBeg();
+                break;
+
+            case 3:
+                deleteEnd();
+                break;
+
+            case 4:
+                printf("Enter element and position: ");
+                scanf("%d%d", &x, &pos);
+                insertBetween(x, pos);
+                break;
+
+            case 5:
+                printf("Enter value to delete: ");
+                scanf("%d", &x);
+                deleteCondition(x);
+                break;
+
+            case 6:
+                display();
+                break;
+
+            case 7:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+
+    } while (choice != 7);
+
+    return 0;
+}
+
+// 8. Write a C program to implement a Stack using two Queues such that the Push
+// operation runs in constant time (O(1)) and the Pop operation runs in linear time
+// (O(n)).
+// Display the contents of the stack after each operation.
+
+#include <stdio.h>
+#define MAX 100
+
+int q1[MAX], q2[MAX];
+int f1 = 0, r1 = -1;
+int f2 = 0, r2 = -1;
+
+void push(int x) {
+    if (r1 == MAX - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+
+    q1[++r1] = x;
+}
+
+int pop() {
+    int x;
+
+    if (r1 == -1)
+        return -1;
+
+    while (f1 < r1)
+        q2[++r2] = q1[f1++];
+
+    x = q1[f1];
+
+    f1 = 0;
+    r1 = -1;
+
+    while (f2 <= r2)
+        q1[++r1] = q2[f2++];
+
+    f2 = 0;
+    r2 = -1;
+
+    return x;
+}
+
+void display() {
+    int i;
+
+    if (r1 == -1) {
+        printf("Stack is Empty\n");
+        return;
+    }
+
+    printf("Stack: ");
+
+    for (i = r1; i >= f1; i--)
+        printf("%d ", q1[i]);
+
+    printf("\n");
+}
+
+int main() {
+    int choice, x;
+
+    do {
+        printf("\n1. Push\n2. Pop\n3. Display\n4. Exit");
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                push(x);
+                display();
+                break;
+
+            case 2:
+                x = pop();
+
+                if (x == -1)
+                    printf("Stack is Empty\n");
+                else
+                    printf("Popped: %d\n", x);
+
+                display();
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
+
+
+
+
+
+// 9. Write a C program to implement a Stack using two Queues such that the Push
+// operation runs in linear time (O(n)) and the Pop operation runs in constant
+// time (O(1)).
+// Display the contents of the stack after each operation
+
+
+#include <stdio.h>
+#define MAX 100
+
+int q1[MAX], q2[MAX];
+int f1 = 0, r1 = -1;
+int f2 = 0, r2 = -1;
+
+void push(int x) {
+    int i;
+
+    q2[++r2] = x;
+
+    while (f1 <= r1)
+        q2[++r2] = q1[f1++];
+
+    f1 = 0;
+    r1 = -1;
+
+    for (i = 0; i <= r2; i++)
+        q1[++r1] = q2[i];
+
+    f2 = 0;
+    r2 = -1;
+}
+
+int pop() {
+    if (r1 == -1)
+        return -1;
+
+    return q1[f1++];
+}
+
+void display() {
+    int i;
+
+    if (f1 > r1) {
+        printf("Stack is Empty\n");
+        return;
+    }
+
+    printf("Stack: ");
+
+    for (i = f1; i <= r1; i++)
+        printf("%d ", q1[i]);
+
+    printf("\n");
+}
+
+int main() {
+    int choice, x;
+
+    do {
+        printf("\n1. Push\n2. Pop\n3. Display\n4. Exit");
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                if (r1 == MAX - 1) {
+                    printf("Stack Overflow\n");
+                    break;
+                }
+
+                printf("Enter element: ");
+                scanf("%d", &x);
+                push(x);
+                display();
+                break;
+
+            case 2:
+                x = pop();
+
+                if (x == -1)
+                    printf("Stack is Empty\n");
+                else
+                    printf("Popped: %d\n", x);
+
+                display();
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
+
+
+
+
+// 10.Write a C program to implement a Priority Queue for a Hospital Management
+// System.
+// Each patient record should include: Name of Patient, Time of Arrival,
+// Condition, Priority (1 = Highest, larger number = lower priority)
+// Perform the following operations using a priority queue:
+// 1. Insert new patient details into the queue.
+// 2. Display the list of patients according to their priority order (lowest number
+// first).
+// 3. Delete (serve) the patient with the highest priority (lowest priority number).
+// Use the following sample data to initialize the queue:
+// Name of
+// Patient
+// Time of
+// Arrival Condition Priority
+// Pramod 10:35 Headache 4
+// Narendra 10:40 Fracture 2
+// Harish 10:45 Heart Attack 1
+// Vandana 10:50 Fever 3
+
+
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+
+struct patient {
+    char name[30];
+    char time[10];
+    char condition[30];
+    int priority;
+};
+
+struct patient q[MAX];
+int n = 0;
+
+void insert(struct patient p) {
+    int i;
+
+    if (n == MAX) {
+        printf("Queue is Full\n");
+        return;
+    }
+
+    i = n - 1;
+
+    while (i >= 0 && q[i].priority > p.priority) {
+        q[i + 1] = q[i];
+        i--;
+    }
+
+    q[i + 1] = p;
+    n++;
+}
+
+void display() {
+    int i;
+
+    if (n == 0) {
+        printf("Queue is Empty\n");
+        return;
+    }
+
+    printf("\nName\tTime\tCondition\tPriority\n");
+
+    for (i = 0; i < n; i++) {
+        printf("%s\t%s\t%s\t%d\n",
+               q[i].name, q[i].time,
+               q[i].condition, q[i].priority);
+    }
+}
+
+void delete() {
+    int i;
+
+    if (n == 0) {
+        printf("Queue is Empty\n");
+        return;
+    }
+
+    printf("Patient Served: %s\n", q[0].name);
+
+    for (i = 0; i < n - 1; i++)
+        q[i] = q[i + 1];
+
+    n--;
+}
+
+int main() {
+    int choice;
+    struct patient p;
+
+    insert((struct patient){"Pramod", "10:35", "Headache", 4});
+    insert((struct patient){"Narendra", "10:40", "Fracture", 2});
+    insert((struct patient){"Harish", "10:45", "Heart Attack", 1});
+    insert((struct patient){"Vandana", "10:50", "Fever", 3});
+
+    do {
+        printf("\n1. Insert Patient");
+        printf("\n2. Display Patients");
+        printf("\n3. Serve Patient");
+        printf("\n4. Exit");
+
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter Patient Name: ");
+                scanf("%s", p.name);
+
+                printf("Enter Arrival Time: ");
+                scanf("%s", p.time);
+
+                printf("Enter Condition: ");
+                scanf("%s", p.condition);
+
+                printf("Enter Priority: ");
+                scanf("%d", &p.priority);
+
+                insert(p);
+                break;
+
+            case 2:
+                display();
+                break;
+
+            case 3:
+                delete();
+                break;
+
+            case 4:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
+
+
+
+
+// 11.Write a C program to implement Breadth-First Search (BFS) traversal on a graph
+// and display the order in which the vertices are visited
+
+
+#include <stdio.h>
+#define MAX 20
+
+int adj[MAX][MAX], visited[MAX];
+int queue[MAX], front = -1, rear = -1;
+int n;
+
+void enqueue(int x) {
+    if (rear == MAX - 1)
+        return;
+
+    if (front == -1)
+        front = 0;
+
+    queue[++rear] = x;
+}
+
+int dequeue() {
+    return queue[front++];
+}
+
+void BFS(int start) {
+    int i, v;
+
+    visited[start] = 1;
+    enqueue(start);
+
+    printf("BFS Traversal: ");
+
+    while (front <= rear) {
+        v = dequeue();
+        printf("%d ", v);
+
+        for (i = 0; i < n; i++) {
+            if (adj[v][i] == 1 && visited[i] == 0) {
+                visited[i] = 1;
+                enqueue(i);
+            }
+        }
+    }
+}
+
+int main() {
+    int i, j, start;
+
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter adjacency matrix:\n");
+
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%d", &adj[i][j]);
+        }
+    }
+
+    printf("Enter starting vertex (0 to %d): ", n - 1);
+    scanf("%d", &start);
+
+    BFS(start);
+
+    return 0;
+}
+
+
+
+
+// 12.Write a C program to implement Depth-First Search (DFS) traversal on a graph
+// and display the order in which the vertices are visited.
+
+
+#include <stdio.h>
+#define MAX 20
+
+int adj[MAX][MAX], visited[MAX];
+int n;
+
+void DFS(int v) {
+    int i;
+
+    visited[v] = 1;
+    printf("%d ", v);
+
+    for (i = 0; i < n; i++) {
+        if (adj[v][i] == 1 && visited[i] == 0)
+            DFS(i);
+    }
+}
+
+int main() {
+    int i, j, start;
+
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter adjacency matrix:\n");
+
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%d", &adj[i][j]);
+        }
+    }
+
+    printf("Enter starting vertex (0 to %d): ", n - 1);
+    scanf("%d", &start);
+
+    printf("DFS Traversal: ");
+    DFS(start);
+
+    return 0;
+}
+
+
+
+
+
+// 13.Write a C program to implement Insertion Sort to arrange a list of numbers in
+// ascending order and display the sorted output.
+
+
+
+#include <stdio.h>
+#define MAX 100
+
+void insertionSort(int a[], int n) {
+    int i, j, key;
+
+    for (i = 1; i < n; i++) {
+        key = a[i];
+        j = i - 1;
+
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j];
+            j--;
+        }
+
+        a[j + 1] = key;
+    }
+}
+
+void display(int a[], int n) {
+    int i;
+
+    printf("Sorted Array: ");
+    for (i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    printf("\n");
+}
+
+int main() {
+    int a[MAX], n, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter elements:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    insertionSort(a, n);
+    display(a, n);
+
+    return 0;
+}
+
+
+
+
+
+// 14.Write a C program to implement Merge Sort to sort an array of elements in
+// ascending order and display the sorted output
+
+#include <stdio.h>
+
+#define MAX 100
+
+
+void merge(int a[], int low, int mid, int high) {
+    int i = low, j = mid + 1, k = 0;
+    int temp[MAX];
+
+    while (i <= mid && j <= high) {
+        if (a[i] < a[j])
+            temp[k++] = a[i++];
+        else
+            temp[k++] = a[j++];
+    }
+
+    while (i <= mid)
+        temp[k++] = a[i++];
+
+    while (j <= high)
+        temp[k++] = a[j++];
+
+    for (i = low, k = 0; i <= high; i++, k++)
+        a[i] = temp[k];
+}
+
+void mergeSort(int a[], int low, int high) {
+    int mid;
+
+    if (low < high) {
+        mid = (low + high) / 2;
+
+        mergeSort(a, low, mid);
+        mergeSort(a, mid + 1, high);
+
+        merge(a, low, mid, high);
+    }
+}
+
+void display(int a[], int n) {
+    int i;
+
+    printf("Sorted Array: ");
+    for (i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    printf("\n");
+}
+
+int main() {
+    int a[MAX], n, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter elements:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    mergeSort(a, 0, n - 1);
+
+    display(a, n);
+
+    return 0;
+}
+
+
+
+// 15.Write a C program to implement Quick Sort to sort a list of numbers in ascending
+// order and display the sorted output.
+
+#include <stdio.h>
+
+#define MAX 100
+
+void quickSort(int a[], int low, int high) {
+    int i, j, pivot, temp;
+
+    if (low < high) {
+        pivot = a[low];
+        i = low + 1;
+        j = high;
+
+        while (i <= j) {
+            while (i <= high && a[i] <= pivot)
+                i++;
+
+            while (a[j] > pivot)
+                j--;
+
+            if (i < j) {
+                temp = a[i];
+                a[i] = a[j];
+                a[j] = temp;
+            }
+        }
+
+        temp = a[low];
+        a[low] = a[j];
+        a[j] = temp;
+
+        quickSort(a, low, j - 1);
+        quickSort(a, j + 1, high);
+    }
+}
+
+void display(int a[], int n) {
+    int i;
+
+    printf("Sorted Array: ");
+    for (i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    printf("\n");
+}
+
+int main() {
+    int a[MAX], n, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter elements:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    quickSort(a, 0, n - 1);
+
+    display(a, n);
+
+    return 0;
+}
+
+
+
+// 16.Write a C program to implement Heap Sort using a binary heap to arrange
+// elements in ascending order and display the sorted output.
+
+#include <stdio.h>
+
+#define MAX 100
+
+void heapify(int a[], int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+    int temp;
+
+    if (left < n && a[left] > a[largest])
+        largest = left;
+
+    if (right < n && a[right] > a[largest])
+        largest = right;
+
+    if (largest != i) {
+        temp = a[i];
+        a[i] = a[largest];
+        a[largest] = temp;
+
+        heapify(a, n, largest);
+    }
+}
+
+void heapSort(int a[], int n) {
+    int i, temp;
+
+    // Build max heap
+    for (i = n / 2 - 1; i >= 0; i--)
+        heapify(a, n, i);
+
+    // Extract elements from heap
+    for (i = n - 1; i > 0; i--) {
+        temp = a[0];
+        a[0] = a[i];
+        a[i] = temp;
+
+        heapify(a, i, 0);
+    }
+}
+
+void display(int a[], int n) {
+    int i;
+
+    printf("Sorted Array: ");
+    for (i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    printf("\n");
+}
+
+int main() {
+    int a[MAX], n, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter elements:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    heapSort(a, n);
+
+    display(a, n);
+
+    return 0;
+}
+
+
+
+
+// 17.Write a C program to implement a Circular Queue using arrays that supports the
+// following operations:
+// ● Enqueue (Insert an element)
+// ● Dequeue (Remove an element)
+// ● Display all elements of the queue
+
+
+#include <stdio.h>
+
+#define MAX 5
+
+int queue[MAX];
+int front = -1, rear = -1;
+
+void enqueue(int x) {
+    if ((rear + 1) % MAX == front) {
+        printf("Queue Overflow\n");
+        return;
+    }
+
+    if (front == -1)
+        front = 0;
+
+    rear = (rear + 1) % MAX;
+    queue[rear] = x;
+
+    printf("Element inserted\n");
+}
+
+void dequeue() {
+    if (front == -1) {
+        printf("Queue Underflow\n");
+        return;
+    }
+
+    printf("Deleted element: %d\n", queue[front]);
+
+    if (front == rear) {
+        front = rear = -1;
+    } else {
+        front = (front + 1) % MAX;
+    }
+}
+
+void display() {
+    int i;
+
+    if (front == -1) {
+        printf("Queue is Empty\n");
+        return;
+    }
+
+    printf("Queue elements: ");
+    i = front;
+
+    while (1) {
+        printf("%d ", queue[i]);
+
+        if (i == rear)
+            break;
+
+        i = (i + 1) % MAX;
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int choice, x;
+
+    while (1) {
+        printf("\n1. Enqueue\n2. Dequeue\n3. Display\n4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                enqueue(x);
+                break;
+
+            case 2:
+                dequeue();
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                return 0;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+    }
+}
+
+
+
+
+
+// 18.Write a C program to implement a Double-Ended Queue (Dequeue) using arrays
+// that supports the following operations:
+// ● Insert and delete elements from both ends
+// ● Display the current contents of the dequeue
+
+
+#include <stdio.h>
+
+#define MAX 5
+
+int deque[MAX];
+int front = -1, rear = -1;
+
+void insertFront(int x) {
+    if ((front == 0 && rear == MAX - 1) || (front == rear + 1)) {
+        printf("Deque Overflow\n");
+        return;
+    }
+
+    if (front == -1) {
+        front = rear = 0;
+    } else if (front == 0) {
+        front = MAX - 1;
+    } else {
+        front--;
+    }
+
+    deque[front] = x;
+    printf("Element inserted\n");
+}
+
+void insertRear(int x) {
+    if ((front == 0 && rear == MAX - 1) || (front == rear + 1)) {
+        printf("Deque Overflow\n");
+        return;
+    }
+
+    if (front == -1) {
+        front = rear = 0;
+    } else if (rear == MAX - 1) {
+        rear = 0;
+    } else {
+        rear++;
+    }
+
+    deque[rear] = x;
+    printf("Element inserted\n");
+}
+
+void deleteFront() {
+    if (front == -1) {
+        printf("Deque Underflow\n");
+        return;
+    }
+
+    printf("Deleted element: %d\n", deque[front]);
+
+    if (front == rear) {
+        front = rear = -1;
+    } else if (front == MAX - 1) {
+        front = 0;
+    } else {
+        front++;
+    }
+}
+
+void deleteRear() {
+    if (front == -1) {
+        printf("Deque Underflow\n");
+        return;
+    }
+
+    printf("Deleted element: %d\n", deque[rear]);
+
+    if (front == rear) {
+        front = rear = -1;
+    } else if (rear == 0) {
+        rear = MAX - 1;
+    } else {
+        rear--;
+    }
+}
+
+void display() {
+    int i;
+
+    if (front == -1) {
+        printf("Deque is Empty\n");
+        return;
+    }
+
+    printf("Deque elements: ");
+    i = front;
+
+    while (1) {
+        printf("%d ", deque[i]);
+
+        if (i == rear)
+            break;
+
+        i = (i + 1) % MAX;
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int choice, x;
+
+    while (1) {
+        printf("\n1. Insert Front\n2. Insert Rear\n");
+        printf("3. Delete Front\n4. Delete Rear\n");
+        printf("5. Display\n6. Exit\n");
+
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insertFront(x);
+                break;
+
+            case 2:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insertRear(x);
+                break;
+
+            case 3:
+                deleteFront();
+                break;
+
+            case 4:
+                deleteRear();
+                break;
+
+            case 5:
+                display();
+                break;
+
+            case 6:
+                return 0;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+    }
+}
+
+
+
+
+// 19.Write C programs to implement Hash Table using Chaining (Separate Linked
+// Lists) and Perform insertion, searching, and deletion operations.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SIZE 10
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+struct Node *table[SIZE] = {NULL};
+
+int hash(int key) {
+    return key % SIZE;
+}
+
+void insert(int x) {
+    int index = hash(x);
+    struct Node *newnode = (struct Node *)malloc(sizeof(struct Node));
+
+    newnode->data = x;
+    newnode->next = table[index];
+    table[index] = newnode;
+
+    printf("Element inserted\n");
+}
+
+void search(int x) {
+    int index = hash(x);
+    struct Node *temp = table[index];
+
+    while (temp != NULL) {
+        if (temp->data == x) {
+            printf("Element found\n");
+            return;
+        }
+        temp = temp->next;
+    }
+
+    printf("Element not found\n");
+}
+
+void delete(int x) {
+    int index = hash(x);
+    struct Node *temp = table[index];
+    struct Node *prev = NULL;
+
+    while (temp != NULL) {
+        if (temp->data == x) {
+            if (prev == NULL)
+                table[index] = temp->next;
+            else
+                prev->next = temp->next;
+
+            free(temp);
+            printf("Element deleted\n");
+            return;
+        }
+
+        prev = temp;
+        temp = temp->next;
+    }
+
+    printf("Element not found\n");
+}
+
+void display() {
+    int i;
+    struct Node *temp;
+
+    for (i = 0; i < SIZE; i++) {
+        printf("%d: ", i);
+
+        temp = table[i];
+
+        while (temp != NULL) {
+            printf("%d -> ", temp->data);
+            temp = temp->next;
+        }
+
+        printf("NULL\n");
+    }
+}
+
+int main() {
+    int choice, x;
+
+    while (1) {
+        printf("\n1. Insert\n2. Search\n3. Delete\n4. Display\n5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insert(x);
+                break;
+
+            case 2:
+                printf("Enter element to search: ");
+                scanf("%d", &x);
+                search(x);
+                break;
+
+            case 3:
+                printf("Enter element to delete: ");
+                scanf("%d", &x);
+                delete(x);
+                break;
+
+            case 4:
+                display();
+                break;
+
+            case 5:
+                return 0;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+    }
+}
+
+
+
+
+
+// 20.Write C programs to implement Hash Table using Open Addressing (Linear
+// Probing) and Perform insertion, searching, and deletion operations.
+
+
+#include <stdio.h>
+
+#define SIZE 10
+
+int table[SIZE];
+int status[SIZE] = {0};
+
+int hash(int key) {
+    return key % SIZE;
+}
+
+void insert(int x) {
+    int index = hash(x);
+    int i;
+
+    for (i = 0; i < SIZE; i++) {
+        int pos = (index + i) % SIZE;
+
+        if (status[pos] != 1) {
+            table[pos] = x;
+            status[pos] = 1;
+            printf("Element inserted\n");
+            return;
+        }
+    }
+
+    printf("Hash Table is Full\n");
+}
+
+void search(int x) {
+    int index = hash(x);
+    int i;
+
+    for (i = 0; i < SIZE; i++) {
+        int pos = (index + i) % SIZE;
+
+        if (status[pos] == 0)
+            break;
+
+        if (status[pos] == 1 && table[pos] == x) {
+            printf("Element found at index %d\n", pos);
+            return;
+        }
+    }
+
+    printf("Element not found\n");
+}
+
+void delete(int x) {
+    int index = hash(x);
+    int i;
+
+    for (i = 0; i < SIZE; i++) {
+        int pos = (index + i) % SIZE;
+
+        if (status[pos] == 0)
+            break;
+
+        if (status[pos] == 1 && table[pos] == x) {
+            status[pos] = 2;
+            printf("Element deleted\n");
+            return;
+        }
+    }
+
+    printf("Element not found\n");
+}
+
+void display() {
+    int i;
+
+    printf("\nHash Table:\n");
+
+    for (i = 0; i < SIZE; i++) {
+        printf("%d: ", i);
+
+        if (status[i] == 1)
+            printf("%d\n", table[i]);
+        else if (status[i] == 2)
+            printf("Deleted\n");
+        else
+            printf("Empty\n");
+    }
+}
+
+int main() {
+    int choice, x;
+
+    while (1) {
+        printf("\n1. Insert\n2. Search\n3. Delete\n4. Display\n5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                insert(x);
+                break;
+
+            case 2:
+                printf("Enter element to search: ");
+                scanf("%d", &x);
+                search(x);
+                break;
+
+            case 3:
+                printf("Enter element to delete: ");
+                scanf("%d", &x);
+                delete(x);
+                break;
+
+            case 4:
+                display();
+                break;
+
+            case 5:
+                return 0;
+
+            default:
+                printf("Invalid Choice\n");
+        }
+    }
+}
+
+
+
+// 21.Write a C program to demonstrate insertion and collision resolution using linear
+// probingTake hash function H(key) = key % 10.
+// ● Example keys: 23, 22, 21, 25, 24
+// ● Handle collision using Linear Probing (e.g., if Key2 = 34 collides with Key1
+// = 24 at index 4, shift to index 9)
+
+
+#include <stdio.h>
+
+#define SIZE 10
+
+int table[SIZE];
+
+void insert(int key) {
+    int index = key % SIZE;
+    int probes = 0;
+
+    while (table[index] != -1 && probes < SIZE) {
+        printf("Collision at index %d for key %d\n", index, key);
+        index = (index + 1) % SIZE;
+        probes++;
+    }
+
+    if (probes == SIZE) {
+        printf("Hash Table is Full, key %d not inserted\n", key);
+        return;
+    }
+
+    table[index] = key;
+    printf("Key %d inserted at index %d\n", key, index);
+}
+
+void display() {
+    int i;
+
+    printf("\nHash Table:\n");
+
+    for (i = 0; i < SIZE; i++) {
+        if (table[i] == -1)
+            printf("%d: Empty\n", i);
+        else
+            printf("%d: %d\n", i, table[i]);
+    }
+}
+
+
+int main() {
+    int keys[] = {23, 22, 21, 25, 24, 34};
+    int i, n;
+
+    n = sizeof(keys) / sizeof(keys[0]);
+
+    for (i = 0; i < SIZE; i++)
+        table[i] = -1;
+
+    printf("Inserting elements using Linear Probing:\n");
+
+    for (i = 0; i < n; i++)
+        insert(keys[i]);
+
+    display();
+
+    return 0;
+}
